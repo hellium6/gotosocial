@@ -10,6 +10,10 @@ GO_BUILDTAGS="${GO_BUILDTAGS-} netgo osusergo static_build kvformat timetzdata"
 GO_LDFLAGS="${GO_LDFLAGS-} -s -w -extldflags '-static' -X 'main.Version=${VERSION:-$(git describe --tags --abbrev=0)}'"
 GO_GCFLAGS=${GO_GCFLAGS-}
 
+# Handle $GO_BIN default
+[ -z "$GO_BIN" ] && \
+    GO_BIN="go"
+
 # Maintain old $DEBUG compat.
 [ ! -z "$DEBUG" ] && \
     GO_BUILDTAGS="${GO_BUILDTAGS} debugenv"
@@ -25,7 +29,7 @@ GO_GCFLAGS=${GO_GCFLAGS-}
 # - moderncsqlite3: reverts to using the C-to-Go transpiled SQLite driver          (disables the WASM-based SQLite driver)
 # - nowasm:         [UNSUPPORTED] removes all WebAssembly from builds including 
 #                   ffmpeg, ffprobe and SQLite (instead falling back to modernc).
-log_exec env CGO_ENABLED=0 go build -trimpath -v \
+log_exec env CGO_ENABLED=0 "$GO_BIN" build -trimpath -v \
                        -tags "${GO_BUILDTAGS}" \
                        -ldflags="${GO_LDFLAGS}" \
                        -gcflags="${GO_GCFLAGS}" \
